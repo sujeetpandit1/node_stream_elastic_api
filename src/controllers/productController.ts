@@ -31,9 +31,11 @@ export async function getProductById(req: Request, res: Response): Promise<void>
 export async function createProduct(req: Request, res: Response): Promise<void> {
   try {
     const productData = req.body;
+    // console.log('Received request body:', productData);
     const product = await productService.createProduct(productData);
     res.status(201).json(product);
   } catch (error: any) {
+    console.error('Error in createProduct controller:', error);
     res.status(500).json({ error: error.message || 'Internal Server Error' });
   }
 }

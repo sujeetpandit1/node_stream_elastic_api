@@ -1,7 +1,6 @@
 import { DataTypes, Model, Sequelize } from "sequelize";
 import { IProduct } from "../types/inference";
 
-
 class Product extends Model<IProduct> implements IProduct {
   public id!: string;
   public name!: string;
@@ -9,13 +8,12 @@ class Product extends Model<IProduct> implements IProduct {
   public description?: string;
 }
 
-// You need to pass the sequelize instance to the `init` method
 function initializeProductModel(sequelize: Sequelize) {
   Product.init(
     {
       id: {
         type: DataTypes.UUID,
-        defaultValue: DataTypes.UUID,
+        defaultValue: DataTypes.UUIDV4,
         primaryKey: true,
       },
       name: {
@@ -24,16 +22,18 @@ function initializeProductModel(sequelize: Sequelize) {
       },
       price: {
         type: DataTypes.FLOAT,
-        // allowNull defaults to true
+        allowNull: false,
       },
       description: {
         type: DataTypes.TEXT,
+        allowNull: true,
       },
     },
     {
-      sequelize, // This is the connection instance
-      tableName: 'products', // Specify the table name if needed
-      timestamps: true, // Automatically manage `createdAt` and `updatedAt`
+      sequelize,
+      modelName: 'Product',
+      tableName: 'products',
+      timestamps: true,
     }
   );
 }
