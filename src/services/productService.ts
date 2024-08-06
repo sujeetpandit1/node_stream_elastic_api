@@ -1,6 +1,5 @@
 import { Product } from "../models/product";
 import { IProduct } from "../types/inference";
-import {v4 as uuid4} from 'uuid'
 import { sendToQueue } from "./rabbitMQServices";
 import { Op } from "sequelize";
 
@@ -14,12 +13,21 @@ export async function getProductById(id: string): Promise<IProduct | null>{
     return await Product.findByPk(id);
 }
 
-export async function createProduct(productData: Omit<IProduct, 'id'>): Promise<IProduct>{
-    const id = uuid4();
-    const product = await Product.create({...productData, id});
-    sendToQueue('product_queue', {action: 'create', product });
+
+export async function createProduct(productData: IProduct): Promise<IProduct> {
+  // console.log('Received product data:', productData);
+  try {
+    const product = await Product.create(productData);
+    // console.log('Product created successfully:', product);
+    sendToQueue('product_queue', {action: 'create', product});
     return product;
+  } catch (error) {
+    console.error('Error creating product:', error);
+    throw error;
+  }
 }
+
+
 
 export async function updateProduct(id: string, productData: Partial<IProduct>):Promise<IProduct>{
     const product = {id, ...productData};
